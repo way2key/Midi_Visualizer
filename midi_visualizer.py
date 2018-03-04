@@ -91,8 +91,9 @@ class line(object):
         for note,sector in self.sectors.items():
             if sector.state == 1 :
                 self.active[note] = note
-
-            elif note in self.active.keys() :
+                tri = sorted(self.active.items(), key=lambda t: t[0])
+                self.active = dict(tri)
+            elif note in self.active.keys():
                 self.active.pop(note)
 
         print(self.active.keys(),note)
@@ -101,12 +102,13 @@ class line(object):
             x = (cos((self.sectors[note].angle / 2) + self.sectors[note].angle_in)  * self.sectors[note].inner_radius)
             y = (sin((self.sectors[note].angle / 2) + self.sectors[note].angle_in)  * self.sectors[note].inner_radius)
             self.vertex.extend([x,y,0])
-            self.color.extend([140,140,140])
+            self.color.extend([140,140,240])
 
-        for i in range(len(self.active)-1):
+        for i in range(len(self.active) - 1):
             self.indices.extend([i, i + 1])
+        self.indices.extend([len(self.active) - 1, 0])
 
-        if len(self.active) > 1:
+        if len(self.active) > 2:
             self.vertices = pyglet.graphics.draw_indexed(len(self.active), GL_LINES, self.indices, ('v3f', self.vertex),('c3B',self.color))
 
 
