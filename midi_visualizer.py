@@ -30,17 +30,20 @@ class sector(object):
             n = 2 * self.points - 1
             self.indices.extend([i, i + 1 , n - i])
             self.indices.extend([n - i, n - 1 - i, i + 1])
+
     def render(self):
         if self.state == 0:
             self.idle()
         elif self.state == 1:
             self.played()
+
     def played(self):
         self.state = 1
         self.color = []
         for i in range(2 * self.points):
             self.color.extend([0,255,0])
         self.vertices = pyglet.graphics.draw_indexed(2 * self.points, GL_TRIANGLES, self.indices, ('v3f', self.vertex),('c3B',self.color))
+
     def idle(self):
         self.state = 0
         self.color = []
@@ -70,6 +73,7 @@ class ring(object):
         for note in self.notes:
             self.notes[note] = sector(0.8, 0.7, pi / 6.4, 2 * i * pi / 12, 360)
             i += 1
+
     def render(self):
         for note in self.notes:
             self.notes[note].render()
@@ -81,7 +85,6 @@ class line(object):
         self.color = []
         self.sectors = sectors
         self.active = {}
-
 
     def render(self):
         self.indices = []
@@ -95,7 +98,6 @@ class line(object):
                 self.active = dict(tri)
             elif note in self.active.keys():
                 self.active.pop(note)
-
         print(self.active.keys(),note)
 
         for note in self.active:
@@ -120,12 +122,10 @@ class myWindow(pyglet.window.Window):
         self.ring = ring()
         self.line = line(self.ring.notes)
 
-
     def on_draw(self):
         self.clear()
         self.ring.render()
         self.line.render()
-
 
     def on_resize(self, width, height):
         glViewport(0, 0, width, height)
