@@ -1,6 +1,37 @@
 from pyglet.gl import *
 from math import *
-import operator
+import time
+import rtmidi
+import sys
+
+# Midi configuration
+
+midi_in = rtmidi.MidiIn()
+available_ports = midi_in.get_ports()
+print(available_ports)
+port = midi_in.open_port(1)
+
+def printer(message, data):
+    m = message[0][1]%12
+    print(m)
+    #self.ring.notes[key_map[m]].played()
+    return m
+
+port.set_callback(printer, data=None)
+
+key_map = { 0:  "c",
+            1:  "c#",
+            2:  "d#",
+            3:  "d#",
+            4:  "e",
+            5:  "f",
+            6:  "f#",
+            7:  "g",
+            8:  "g#",
+            9:  "a",
+            10: "a#",
+            11: "b"
+                    }
 
 class sector(object):
     def __init__(self, radius, inner_radius, angle, angle_in, points):
@@ -98,7 +129,7 @@ class line(object):
                 self.active = dict(tri)
             elif note in self.active.keys():
                 self.active.pop(note)
-        print(self.active.keys(),note)
+        #print(self.active.keys())
 
         for note in self.active:
             x = (cos((self.sectors[note].angle / 2) + self.sectors[note].angle_in)  * self.sectors[note].inner_radius)
@@ -126,67 +157,24 @@ class myWindow(pyglet.window.Window):
         self.clear()
         self.ring.render()
         self.line.render()
+        #self.ring.notes[key_map[0]].played()
+        #self.ring.notes[key_map[0]].idle()
 
     def on_resize(self, width, height):
         glViewport(0, 0, width, height)
 
     def on_key_press(self, key, modifier):
-        #default behavior
         if key == pyglet.window.key.ESCAPE:
             pyglet.app.exit()
-        # Mapping key presses
-        if key == pyglet.window.key.Q:
-            self.ring.notes['c'].played()
-        elif key == pyglet.window.key.W:
-            self.ring.notes['c#'].played()
-        elif key == pyglet.window.key.E:
-            self.ring.notes['d'].played()
-        elif key == pyglet.window.key.R:
-            self.ring.notes['d#'].played()
-        elif key == pyglet.window.key.T:
-            self.ring.notes['e'].played()
-        elif key == pyglet.window.key.Z:
-            self.ring.notes['f'].played()
-        elif key == pyglet.window.key.U:
-            self.ring.notes['f#'].played()
-        elif key == pyglet.window.key.I:
-            self.ring.notes['g'].played()
-        elif key == pyglet.window.key.O:
-            self.ring.notes['g#'].played()
-        elif key == pyglet.window.key.P:
-            self.ring.notes['a'].played()
-        elif key == pyglet.window.key.A:
-            self.ring.notes['a#'].played()
-        elif key == pyglet.window.key.S:
-            self.ring.notes['b'].played()
+            midi_in.close_port()
+            print("Exit ;(")
+            sys.exit()
 
     def on_key_release(self, key, modifier):
-        #for note in self.ring.notes:
-            #self.ring.notes[note].idle()
         if key == pyglet.window.key.Q:
-            self.ring.notes['c'].idle()
-        elif key == pyglet.window.key.W:
-            self.ring.notes['c#'].idle()
-        elif key == pyglet.window.key.E:
-            self.ring.notes['d'].idle()
-        elif key == pyglet.window.key.R:
-            self.ring.notes['d#'].idle()
-        elif key == pyglet.window.key.T:
-            self.ring.notes['e'].idle()
-        elif key == pyglet.window.key.Z:
-            self.ring.notes['f'].idle()
-        elif key == pyglet.window.key.U:
-            self.ring.notes['f#'].idle()
-        elif key == pyglet.window.key.I:
-            self.ring.notes['g'].idle()
-        elif key == pyglet.window.key.O:
-            self.ring.notes['g#'].idle()
-        elif key == pyglet.window.key.P:
-            self.ring.notes['a'].idle()
-        elif key == pyglet.window.key.A:
-            self.ring.notes['a#'].idle()
-        elif key == pyglet.window.key.S:
-            self.ring.notes['b'].idle()
+            self.ring.notes[key_map[1]].played()
+
+    #time.sleep(1)
 
 
 if __name__ == "__main__":
