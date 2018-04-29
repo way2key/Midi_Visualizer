@@ -5,7 +5,6 @@ import rtmidi
 import sys
 
 # Midi configuration
-
 midi_in = rtmidi.MidiIn()
 available_ports = midi_in.get_ports()
 print(available_ports)
@@ -13,11 +12,10 @@ port = midi_in.open_port(1)
 
 def printer(message, data):
     m = message[0][1]%12
-    print(m)
-    window.ring.notes[key_map[m]].played()
-
-
-
+    if window.ring.notes[key_map[m]].state == 0:
+        window.ring.notes[key_map[m]].played()
+    else:
+        window.ring.notes[key_map[m]].idle()
 
 key_map = { 0:  "c",
             1:  "c#",
@@ -144,7 +142,6 @@ class line(object):
         if len(self.active) > 2:
             self.vertices = pyglet.graphics.draw_indexed(len(self.active), GL_LINES, self.indices, ('v3f', self.vertex),('c3B',self.color))
 
-
 class myWindow(pyglet.window.Window):
 
     def __init__(self, *args, **kwargs):
@@ -177,7 +174,10 @@ class myWindow(pyglet.window.Window):
         if key == pyglet.window.key.Q:
             self.ring.notes[key_map[1]].played()
 
+    def update(dt):
+        pass
 
+    pyglet.clock.schedule_interval(update, 1/60)
 
 if __name__ == "__main__":
     window = myWindow(800, 800, "Midi_Visualizer", resizable=True)
