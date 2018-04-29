@@ -14,14 +14,14 @@ port = midi_in.open_port(1)
 def printer(message, data):
     m = message[0][1]%12
     print(m)
-    #self.ring.notes[key_map[m]].played()
-    return m
+    window.ring.notes[key_map[m]].played()
 
-port.set_callback(printer, data=None)
+
+
 
 key_map = { 0:  "c",
             1:  "c#",
-            2:  "d#",
+            2:  "d",
             3:  "d#",
             4:  "e",
             5:  "f",
@@ -146,8 +146,11 @@ class line(object):
 
 
 class myWindow(pyglet.window.Window):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        icon = pyglet.image.load('icon.png')
+        self.set_icon(icon)
         self.set_minimum_size(300, 300)
         glClearColor(0.2, 0.2, 0.21, 1)
         self.ring = ring()
@@ -174,9 +177,10 @@ class myWindow(pyglet.window.Window):
         if key == pyglet.window.key.Q:
             self.ring.notes[key_map[1]].played()
 
-    #time.sleep(1)
 
 
 if __name__ == "__main__":
-    windows = myWindow(800, 800, "midi_visualizer", resizable=True)
+    window = myWindow(800, 800, "Midi_Visualizer", resizable=True)
+    port.set_callback(printer)
+
     pyglet.app.run()
