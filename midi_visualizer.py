@@ -8,14 +8,25 @@ import sys
 midi_in = rtmidi.MidiIn()
 available_ports = midi_in.get_ports()
 print(available_ports)
-port = midi_in.open_port(1)
+question = input("Write the index of the midi device you want to use: ")
+port = midi_in.open_port(int(question))
 
 def printer(message, data):
     m = message[0][1]%12
-    if window.ring.notes[key_map[m]].state == 0:
+    octave = message[0][1]//12
+
+    if message[0][2] != 0:
+        #When a note is hit
         window.ring.notes[key_map[m]].played()
-    else:
+        window.ring.notes[key_map[m]].multiple += 1
+    elif message[0][2] == 0 and window.ring.notes[key_map[m]].multiple <= 1:
+        #When a note is released
         window.ring.notes[key_map[m]].idle()
+        window.ring.notes[key_map[m]].multiple -= 1
+    else:
+        #More than 1 octave simultaneously
+        window.ring.notes[key_map[m]].multiple -= 1
+
 
 key_map = { 0:  "c",
             1:  "c#",
@@ -42,6 +53,8 @@ class sector(object):
         self.color = []
         self.indices = []
         self.state = 0
+        self.octave = None
+        self.multiple = 0
         self.inner_point = angle/2+angle
         for i in range(self.points):
             angle = self.angle * (i / (self.points - 1)) + angle_in
